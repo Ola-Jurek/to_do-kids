@@ -1,35 +1,23 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.scss'
+import {Form} from "./Form.jsx";
+import {ToDoList} from "./To_do_list.jsx";
 
-function App() {
+export const App = () => {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="logo"></div>
+      <h1> Wybierz użytkownika </h1>
+      <Form className="form"/>
+      <button className="add_child"> + </button>
+
+      <div className="list_of_children">
+      <button className="child_name"> {name}  Ola </button>
+      {/*<ToDoList className="to_to_list"/>*/}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
 
-export default App
