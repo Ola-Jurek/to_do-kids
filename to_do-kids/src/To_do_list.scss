@@ -1,0 +1,121 @@
+
+.to_do_component {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 5em;
+    width: 60vw;
+    border-bottom: 1px solid cornflowerblue;
+
+    .logo_small {
+      width: 130px;
+      height: 50px;
+      background-image: url("./assets/logo.png");
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    .child_name_small {
+      border-radius: 15px;
+      border: 1px solid transparent;
+      background-color: lightcoral; // kolor zależny od wpisanej płci dziecka
+      //font-size: 2em;
+      padding: 0 4px;
+      font-family: inherit;
+      //cursor: pointer;
+    }
+    .change_child {
+      border: 1px solid cornflowerblue;
+      border-radius: 15px;
+      padding: 0 4px;
+
+      &:hover {
+        transform: scale(1.3);
+        transition: 0.3s ease-in-out;
+      }
+    }
+  }
+  .to_do_list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .add_task {
+      border-radius: 15px;
+      border: 1px solid transparent;
+      background-color: lightseagreen;
+      padding: 0 0.5em;
+      margin: 30px 0 30px 0;
+      font-size: 2em;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .close_form_task {
+      font-family: 'Sacramento', cursive;
+      font-size: 20px;
+      margin: 20px 90px 0 90px;
+      border: 1px solid lightseagreen;
+      background-color: inherit;
+      cursor: pointer;
+      border-radius: 15px;
+      padding: 0 10px;
+      max-width: 50px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .task_list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-wrap: wrap;
+      //overflow: hidden;
+    }
+
+    .task {
+      background-color: lightyellow;
+      border: 1px solid transparent;
+      border-radius: 15px;
+      padding: 5px 10px;
+      margin: 0.5em 0.5em;
+      font-family: 'Poiret One', cursive;
+      font-size: 1.5em;
+      cursor: pointer;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      transition: 0.3s ease-in-out;
+
+      &.clicked {
+        background-color: lightgreen;
+        transition: 0.3s ease-in-out;
+      }
+    }
+
+  }
+  .end_day {
+    border-radius: 15px;
+    border: 1px solid transparent;
+    background-color: lightseagreen;
+    padding: 0 0.5em;
+    margin-top: 1.8em;
+    font-size: 2em;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .end_day_message {
+    border: 2px solid cornflowerblue;
+    border-radius: 15px;
+    font: inherit;
+    font-size: 3em;
+  }
+}
