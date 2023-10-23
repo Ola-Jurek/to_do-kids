@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {doc, getDoc} from "firebase/firestore";
 import {db} from "./firebase/index.js";
+import {useParams} from "react-router-dom";
 
 export const UserName = () => {
     const [data, setData] = useState("");
 
-    const currentUrl = window.location.href;
-    const parts = currentUrl.split("/");
-    const id = parts[parts.length - 1];
-    console.log("id:", id);
+    const {name} = useParams()
+    const id = name;
 
     useEffect(() => {
         const docRef = doc(db, "kids", id);

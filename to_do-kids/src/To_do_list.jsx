@@ -1,87 +1,122 @@
-import React, {useEffect, useState} from 'react';
-import {Link} from "react-router-dom";
+import React, {useEffect, useState, useRef} from 'react';
+import {Link, useParams} from "react-router-dom";
 import './firebase/index'
 import './App.jsx'
 import './App.scss';
 import './To_do_list.scss';
 import './index.scss';
-import {Form} from "./Form.jsx";
-import {Form_task} from "./Form_task.jsx";
-import {App} from "./App.jsx";
+import './Form_task.scss';
 import ReactConfetti from "react-confetti";
 import {UserName} from "./User_name.jsx";
-import {doc, getDoc, collection, getDocs, updateDoc, addDoc, query} from "firebase/firestore";
+import {collection, getDocs, addDoc, doc, updateDoc, serverTimestamp} from "firebase/firestore";
 import {db} from "./firebase/index.js";
 
 
-export const ToDoList = (user) => {
-    const [tasks, setTasks] = useState([]);
+
+
+export const ToDoList = () => {
+
+    const [task, setTask] = useState("");
     const [isFormTaskVisible, setIsFormTaskVisible] = useState(false);
-    const [isButtonClicked, setIsButtonClicked] = useState(false);
+
     const [confettiRun, setConfettiRun] = useState(false);
     const [isScoreWindowVisible, setIsScoreWindowVisible] = useState(false);
-
-        const buttonClick = () => {
-            setIsButtonClicked(!isButtonClicked);
-        };
-        const buttonConfetti = () => {
-            setConfettiRun(true);
-            setIsScoreWindowVisible(true);
-        }
-        const addTask = (task) => {
-            setTasks([...tasks, task]);
-        }
-        const handleButtonClick = () => {
-            setIsFormTaskVisible(true);
-        };
-        const formTaskClose = () => {
-            setIsFormTaskVisible(false);
-        };
-
-        const currentUrl = window.location.href;
-        const parts = currentUrl.split("/");
-        const id = parts[parts.length -1];
-        console.log("id:", id);
+    const [data, setData] = useState([]);
+    const [activeButtons, setActiveButtons] = useState([]);
 
 
-    // useEffect(() => {  //wyciągnięcie jednego dziecka po id- powielony kod, to samo w User_name
-    //
-    //     const docRef = doc(db, "kids", id);
-    //
-    //     getDoc(docRef)
-    //         .then((docSnap) => {
-    //             if (docSnap.exists()) {
-    //                 console.log("Document data:", docSnap.data());
-                // } else {
-                //     docSnap.data()
-                //     console.log("No such document!");
-                // }
-            // })
-            // .catch((error) => {
-            //     console.log("Error getting document:", error);
-            // });
-    // }, []);
+    // const currentUrl = window.location.href;
+    // const parts = currentUrl.split("/");
+    // const id = parts[parts.length -1];
+
+    const {name} = useParams()
+    const id = name;
 
 
-     // useEffect(() => {
-     //     const kidDoc = doc(db,'kids', id);
-     //     const tasksCollection = collection(kidDoc, 'tasks');
-     //     const q = query(tasksCollection);
-     //
-     //     getDocs(q)
-     //         .then((querySnapshot) => {
-     //             querySnapshot.forEach((doc) => {
-     //                 addTask({
-     //                     id: doc.id,
-     //                     ...doc.data()
-     //                 })
-     //                 console.log(doc.id, "=>", doc.data);
-     //             });
-     //         })
-     //         .catch((error) => {
-     //             console.error("Error getting documents: ", error);
-     //         });
-     // }, []);
+    const buttonConfetti = () => {
+        setConfettiRun(true);
+        setIsScoreWindowVisible(true);
+    }
+    const addTask = (task) => {
+        setData([...data, {name: task}]);
+    }
+    const handleButtonClick = () => {
+        setIsFormTaskVisible(true);
+    };
+    const formTaskClose = () => {
+        setIsFormTaskVisible(false);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        addDoc(collection(db, "kids", id, "tasks"),{
+            name: task,
+            date: serverTimestamp(),
+        })
+            .then(() => {
+                addTask(task);
+                console.log("Dane zostały pomyślnie zapisane.");
+            })
+            .catch((error) => {
+                console.error("Błąd podczas zapisywania danych:", error);
+            });
+        setTask("");
+    }
+
+
+     useEffect(() => {
+
+         const storedActiveButtons = JSON.parse(localStorage.getItem("activeButtons")) || [];
+         setActiveButtons(storedActiveButtons);
+
+         const storedDate = localStorage.getItem("date");
+         const currentDate = new Date().toLocaleDateString();
+
+         if (storedDate !== currentDate) {
+             setActiveButtons([]);
+             localStorage.setItem("date", currentDate);
+         }
+
+         getDocs(collection(db, "kids", id, "tasks"))
+                .then((querySnapshot) => {
+                 const newData = [];
+                    querySnapshot.forEach((task) => {
+                        newData.push({
+                         taskId: task.id,
+                            ...task.data()
+                    })
+                    console.log(task.id, " => ", task.data());
+                    setData(newData);
+                    });
+                 })
+                 .catch((error) => {
+                    console.error("Błąd podczas pobierania danych:", error);
+                 });
+
+     }, []);
+
+
+     const buttonClick = (taskId) => {
+         const updatedButtons = activeButtons.includes(taskId)
+             ? activeButtons.filter(id => id !== taskId)
+             : [...activeButtons, taskId];
+
+         setActiveButtons(updatedButtons);
+
+         const docRef = doc(db, "kids", id, "tasks", taskId);
+
+         updateDoc(docRef, {
+             date: serverTimestamp()
+         })
+             .then(() => {
+                 localStorage.setItem("activeButtons", JSON.stringify(activeButtons));
+                 console.log("Pole date zostało pomyślnie zaktualizowane.");
+             })
+             .catch((error) => {
+                 console.error("Błąd podczas aktualizacji dokumentu:", error);
+             });
+     };
 
 
         return (
@@ -98,16 +133,25 @@ export const ToDoList = (user) => {
                         <button className="add_task" onClick={handleButtonClick}> Dodaj nowe zadanie </button>
                     )}
                     {isFormTaskVisible && (
-                        <Form_task onAddTask={addTask}/>
+
+                        <form className="form_task"  onSubmit={handleSubmit} >
+                            <input className="input_task" type="text" value={task} placeholder="Tutaj wpisz treść zadania" onChange={(e) => setTask(e.target.value)}/>
+                            <button className="submit_task" type="submit"  > Dodaj </button>
+                        </form>
+
+
                     )}
                     {isFormTaskVisible && (
                         <button className="close_form_task" onClick={formTaskClose}> ok </button>
                     )}
 
                     <div className="task_list">
-                        {tasks.map((task, index) => (
-                            <button className={`task ${isButtonClicked ? 'clicked' : ''}`} onClick={buttonClick}
-                                    key={index}> {index} {task} </button>
+                        {data.map((task) => (
+                            <button
+                                className={`task ${activeButtons.includes(task.taskId) ? 'active' : ''}`}
+                                onClick={()=> buttonClick(task.taskId)}
+                                key={task.taskId} >{task.name}
+                            </button>
                         ))}
                     </div>
 
@@ -116,7 +160,7 @@ export const ToDoList = (user) => {
                     <button onClick={buttonConfetti} className="end_day"> Koniec dnia</button>
                 )}
                 {isScoreWindowVisible && (
-                    <div className="end_day_message"> Świetna robota! Udało Ci się wykonać ... zadań.</div>
+                    <div className="end_day_message"> Świetna robota! </div>
                 )}
             </div>
         );

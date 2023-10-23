@@ -4,7 +4,7 @@ import {App} from './App.jsx'
 import './index.scss'
 import {BrowserRouter, HashRouter, Link, Route, Routes} from "react-router-dom";
 import {ToDoList} from "./To_do_list.jsx";
-import {ListOfChildren} from "./List_of_children.jsx";
+
 
 
 
